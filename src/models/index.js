@@ -1,65 +1,64 @@
-import Book from "./book.model.js"
-import Author from "./author.model.js"
-import Publisher from "./publidher.model.js"
+import Book from "./book.model.js";
+import Author from "./author.model.js";
+import Publisher from "./publisher.model.js";
 import {sequelize} from "../config/database.js";
 import {DataTypes} from "sequelize";
 
 // Book and Publisher. One-To-Many relationship
 Book.belongsTo(Publisher, {
-  foreignKey: 'publisher',
-  targetKey: 'publisher_name',
-  as: 'publisherDetails'
+  foreignKey: "publisher",
+  targetKey: "publisher_name",
+  as: "publisherDetails"
 });
 
 Publisher.hasMany(Book, {
-  foreignKey: 'publisher',
-  targetKey: 'publisher_name',
-  as: 'books'
+  foreignKey: "publisher",
+  targetKey: "publisher_name",
+  as: "books"
 });
 
 // Book and Author, Many-To-Many
 // Define the junction table
-const BookAuthors = sequelize.define('BooksAuthor',
-  {
+const BooksAuthors = sequelize.define('BooksAuthors', {
   isbn: {
     type: DataTypes.STRING,
     references: {
       model: Book,
-      key: 'isbn'
+      key: "isbn"
     }
   },
-    author_name: {
+  author_name: {
     type: DataTypes.STRING,
-      references: {
-        model: Author,
-        key: 'name'
-      }
+    references: {
+      model: Author,
+      key: "name"
     }
-  }, {
-  tableName: 'books_authors',
+  }
+}, {
+  tableName: 'books_authors'
 })
 
 Book.belongsToMany(Author, {
-  through: BookAuthors,
-  foreignKey: 'isbn',
-  otherKey: 'author_name',
-  as: 'authors'
+  through: BooksAuthors,
+  foreignKey: "isbn",
+  otherKey: "author_name",
+  as: "authors"
 })
 
 Author.belongsToMany(Book, {
-  through: BookAuthors,
-  foreignKey: 'author_name',
-  otherKey: 'isbn',
-  as: 'books'
+  through: BooksAuthors,
+  foreignKey: "author_name",
+  otherKey: "isbn",
+  as: "books"
 })
 
 const syncModels = async () => {
   try {
     await sequelize.sync();
     console.log('Models synced successfully')
-  }catch (e) {
-    console.error('Error syncing models:', e)
+  } catch (e) {
+    console.log('Error syncing models', e)
   }
 }
 
-export {syncModels, Book, Author, Publisher};
+export {syncModels, Book, Author, Publisher}

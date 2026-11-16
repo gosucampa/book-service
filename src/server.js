@@ -1,13 +1,12 @@
 import express from 'express';
-import bookRoutes from './routes/book.routes.js';
-import authorRoutes from './routes/author.routes.js';
-import publisherRoutes from './routes/publisher.routes.js';
-import errorHandler from './middlewares/error.middleware.js';
-import {dbConnection} from './config/database.js';
-import {syncModels} from './models/index.js';
+import bookRoutes from "./routes/book.routes.js";
+import authorRoutes from "./routes/author.routes.js";
+import publisherRoutes from "./routes/publisher.routes.js";
+import errorHandler from "./middlewares/error.middleware.js";
+import {dbConnection} from "./config/database.js";
+import {syncModels} from "./models/index.js";
 
 const app = express();
-
 
 app.use(express.json());
 
@@ -17,12 +16,12 @@ app.use(publisherRoutes);
 
 app.use(errorHandler);
 
-app.use((req, res) => res.status(404).type('text/plain; charset=utf-8').send('Route not found'));
+app.use((req, res) => res.status(404).type('text/plain; charset=utf-8').send('Not Found'));
 
 async function startServer() {
   await dbConnection();
   await syncModels();
-  app.listen(process.env.PORT || 8080, () => console.log(`Server started on port ${process.env.PORT || 8080}. Press Ctrl+C to Stop`))
+  app.listen(process.env.PORT || 8080 , () => console.log(`Server started on port ${process.env.PORT || 8080}. Press Ctrl-C to Stop`));
 }
 
 startServer();

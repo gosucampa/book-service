@@ -18,7 +18,7 @@ const Book = sequelize.define('Book', {
     }
   }
 }, {
-  tableName: 'books',
+  tableName: 'books'
 })
 
 export default Book;
