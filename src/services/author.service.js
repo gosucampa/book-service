@@ -1,6 +1,7 @@
 import * as bookRepository from '../repositories/book.repository.js';
 import { sequelize } from '../config/database.js';
 import * as authorRepository from '../repositories/author.repository.js';
+import {Author} from '../models/index.js';
 
 export const findBookAuthors = async (isbn)  => {
   const book = await bookRepository.findBookById(isbn);
@@ -25,6 +26,21 @@ export const removeAuthor = async (authorName) => {
     });
     if (!author) {
       throw new Error(`Author with name ${authorName} not found`);
+    }
+    const books = await author.getBooks({
+      joinTableAttributes: [],
+      include: [
+        {
+          model: Author,
+          as: 'authors',
+          through: {attributes: []},
+        }
+      ], transaction: t
+    });
+    for (const book of books) {
+      if (book.authors.length === 1) {
+        await book.destroy({transaction: t});
+      }
     }
     await author.destroy({transaction: t});
     await t.commit();
