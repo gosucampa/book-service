@@ -1,5 +1,6 @@
 import * as bookRepository from '../repositories/book.repository.js';
 import { sequelize } from '../config/database.js';
+import * as authorRepository from '../repositories/author.repository.js';
 
 export const findBookAuthors = async (isbn)  => {
   const book = await bookRepository.findBookById(isbn);
@@ -15,5 +16,22 @@ export const findBookAuthors = async (isbn)  => {
 }
 
 export const removeAuthor = async (authorName) => {
-  // TODO: Implement removeAuthor service
+  const t = await sequelize.transaction();
+  try {
+    const author = await authorRepository.findAuthorById(authorName, {
+      attributes: ['name',
+        [sequelize.col('birth_date'), 'birthDate']
+      ],transaction: t
+    });
+    if (!author) {
+      throw new Error(`Author with name ${authorName} not found`);
+    }
+    await author.destroy({transaction: t});
+    await t.commit();
+    return author;
+  }catch (e) {
+    await t.rollback();
+    console.log('Error removing author:', e);
+    throw e;
+  }
 }
