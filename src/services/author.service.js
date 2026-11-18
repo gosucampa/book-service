@@ -1,9 +1,9 @@
 import * as bookRepository from '../repositories/book.repository.js';
-import { sequelize } from '../config/database.js';
+import {sequelize} from '../config/database.js';
 import * as authorRepository from '../repositories/author.repository.js';
 import {Author} from '../models/index.js';
 
-export const findBookAuthors = async (isbn)  => {
+export const findBookAuthors = async (isbn) => {
   const book = await bookRepository.findBookById(isbn);
   if (!book) {
     throw new Error(`Book with isbn ${isbn} not found`);
@@ -22,30 +22,19 @@ export const removeAuthor = async (authorName) => {
     const author = await authorRepository.findAuthorById(authorName, {
       attributes: ['name',
         [sequelize.col('birth_date'), 'birthDate']
-      ],transaction: t
+      ], transaction: t
     });
     if (!author) {
       throw new Error(`Author with name ${authorName} not found`);
     }
-    const books = await author.getBooks({
-      joinTableAttributes: [],
-      include: [
-        {
-          model: Author,
-          as: 'authors',
-          through: {attributes: []},
-        }
-      ], transaction: t
-    });
-    for (const book of books) {
-      if (book.authors.length === 1) {
+    const books = await author.getBooks({transaction: t});
+    for (const book of books){
         await book.destroy({transaction: t});
       }
-    }
     await author.destroy({transaction: t});
     await t.commit();
     return author;
-  }catch (e) {
+  } catch (e) {
     await t.rollback();
     console.log('Error removing author:', e);
     throw e;
