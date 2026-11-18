@@ -6,6 +6,3 @@ export const findBookById = async (id, options = {}) => Book.findByPk(id, option
 
 export const findBooks = async (options = {}) => Book.findAll(options);
 
-export const removeBook = async (book) => book.destroy();
-
-export const updateBookTitle = async (book, title) => book.update({title});
