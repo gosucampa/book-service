@@ -21,7 +21,7 @@ export const removeAuthor = async (authorName) => {
     const author = await authorRepository.findAuthorById(authorName, {
       attributes: ['name',
         [sequelize.col('birth_date'), 'birthDate']
-      ],transaction: t
+      ],joinTableAttributes: []
     });
     if (!author) {
       throw new Error(`Author with name ${authorName} not found`);
