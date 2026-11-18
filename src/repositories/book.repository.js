@@ -6,3 +6,4 @@ export const findBookById = async (id, options = {}) => Book.findByPk(id, option
 
 export const findBooks = async (options = {}) => Book.findAll(options);
 
+export const booksSummary = async (filed, functionName, options = {}) =>  await Book.aggregate(functionName, filed, options);
